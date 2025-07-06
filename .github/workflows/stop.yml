@@ -2,13 +2,21 @@ name: stop instance and containers
 
 on:
   schedule:
-    - cron: '30 5 * * 1-5' 
+    - cron: '30 5 * * 1-5'
   workflow_dispatch:
 
 jobs:
   shutdown:
     runs-on: ubuntu-latest
+
     steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
     - name: Get EC2 Public IP
       id: ec2ip
       run: |
@@ -17,22 +25,17 @@ jobs:
           --region ${{ secrets.AWS_REGION }} \
           --query "Reservations[0].Instances[0].PublicIpAddress" \
           --output text)
-        echo "IP=$IP" >> $GITHUB_ENV
+        echo "EC2_IP=$IP" >> $GITHUB_ENV
 
     - name: Stop containers on EC2
       uses: appleboy/ssh-action@v1.0.3
       with:
-        host: ${{ env.IP }}
+        host: ${{ env.EC2_IP }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         script: |
-          docker stop backend || true
-          docker stop frontend || true
+          docker stop backend || true && docker rm backend || true
+          docker stop frontend || true && docker rm frontend || true
 
     - name: Stop EC2 instance
-      uses: aws-actions/aws-cli-action@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
-        command: ec2 stop-instances --instance-ids ${{ secrets.INSTANCE_ID }}
+      run: aws ec2 stop-instances --instance-ids ${{ secrets.INSTANCE_ID }}
