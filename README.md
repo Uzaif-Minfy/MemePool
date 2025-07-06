@@ -27,3 +27,27 @@ cd ../frontend
 bun i
 bun run dev
 ```
+
+
+# 🚀 CI/CD Workflows
+
+## 1. **Build & Push Docker Images**
+
+- Triggered **on push to `production`**.  
+- Builds Docker images using `docker-compose` and pushes them to DockerHub.
+
+## 2. **Start EC2 & Deploy**
+
+- Triggered automatically at **10:00 AM IST (Mon–Fri)**
+- Or manually from GitHub Actions
+- Starts EC2 instance, pulls latest images, and runs containers
+
+## 3. **Stop EC2 & Clean Up**
+
+- Triggered automatically at **11:00 AM IST (Mon–Fri)**
+- Or manually from GitHub Actions
+- Stops containers and EC2 instance
+
+
+
+
