@@ -8,18 +8,29 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Create .env file
+      run: |
+        echo "PORT=5000" >> .env
+        echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
+        echo "CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}" >> .env
+        echo "CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}" >> .env
+        echo "CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}" >> .env
+        echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+        echo "VITE_API_BASE_URL=${{ secrets.VITE_API_BASE_URL }}" >> .env
+
     - name: DockerHub Login
       run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-    - name: Build images using Docker Compose
+    - name: Build images
       run: docker compose build
 
-    - name: Push backend image to DockerHub
+    - name: Push backend image
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/memepool-backend
 
-    - name: Push frontend image to DockerHub
+    - name: Push frontend image
       run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/memepool-frontend
