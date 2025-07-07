@@ -3,16 +3,18 @@
 services:
   backend:
     image: uzaifminfy/memepool-backend
+    env_file:
+      - .env
     build:
       context: ./backend
     ports:
       - "5000:5000"
-    env_file:
-      - .env
     
 
   frontend:
     image: uzaifminfy/memepool-frontend
+    env_file:
+      - .env
     build:
       context: ./FrontEnd
     ports:
