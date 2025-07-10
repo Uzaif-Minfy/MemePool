@@ -29,7 +29,7 @@ bun run dev
 ```
 
 
-# 🚀 CI/CD Workflows
+#  CI/CD Workflows
 
 ## 1. **Build & Push Docker Images**
 
@@ -48,6 +48,12 @@ bun run dev
 - Or manually from GitHub Actions
 - Stops containers and EC2 instance
 
+## **Repository Secrets**
+
+![alt text](image.png)
 
 
+## **Repository workflows**
+
+![alt text](image-1.png)
 
